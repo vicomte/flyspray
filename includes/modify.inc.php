@@ -796,6 +796,7 @@ switch ($action = Req::val('action'))
     // ##################
     case 'admin.edituser':
     case 'myprofile.edituser':
+
         if (Post::val('delete_user')) {
             // check that he is not the last user
             $sql = $db->Query('SELECT count(*) FROM {users}');
@@ -897,6 +898,49 @@ switch ($action = Req::val('action'))
         $_SESSION['SUCCESS'] = L('userupdated');
         break;
 
+    case 'myprofile.uploadUserProfile':
+    {
+       //TODO: Upload file, resize file, restrict files and add security to it.
+       //Look at 116 area on how attatchments are done.
+       // Backend::upload_files($task['task_id'], '0', 'usertaskfile');
+        if (Post::val('profilePic'))
+        {
+            Flyspray::show_error("Invalid Files");
+            $allowedExts = array("jpg", "jpeg", "gif", "png");
+            $extension = end(explode(".", $_FILES["profilePic"]["name"]));
+            if ((($_FILES["profilePic"]["type"] == "image/gif")
+                || ($_FILES["profilePic"]["type"] == "image/jpeg")
+                || ($_FILES["profilePic"]["type"] == "image/png")
+                || ($_FILES["profilePic"]["type"] == "image/pjpeg"))
+                && ($_FILES["profilePic"]["size"] < 512000)
+                && in_array($extension, $allowedExts))
+            {
+                if ($_FILES["profilePic"]["error"] > 0)
+                {
+                    Flyspray::show_error("Invalid File");
+                    break;
+                }
+                else
+                {
+                    Flyspray::show_error("File");
+
+                    // echo "Upload: " . $_FILES["profilePic"]["name"] . "<br>";
+                    // echo "Type: " . $_FILES["profilePic"]["type"] . "<br>";
+                    //echo "Size: " . ($_FILES["profilePic"]["size"] / 1024) . " kB<br>";
+                    //echo "Stored in: " . $_FILES["profilePic"]["tmp_name"];
+                    move_uploaded_file($_FILES["profilePic"]["tmp_name"], BASEDIR."/profilepics/".$_FILES["profilePic"]["name"]);
+
+                }
+            }
+            else
+            {
+                Flyspray::show_error("Invalid File");
+            }
+        }
+
+        $_SESSION['SUCCESS'] = L('Profile Pic Updated');
+        break;
+    }
     // ##################
     // updating a group definition
     // ##################

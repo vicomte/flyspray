@@ -1,4 +1,19 @@
-  <form action="<?php if ($do == 'myprofile'): ?>{CreateUrl('myprofile')}<?php else: ?>{CreateUrl('edituser', $theuser->id)}<?php endif; ?>" method="post">
+    <?php if($fs->prefs['gravatars'] == 1) {?>
+<div style="float: right">
+    <form enctype="multipart/form-data" action="<?php if ($do == 'myprofile'): ?>{CreateUrl('myprofile')}<?php else: ?>{CreateUrl('edituser', $theuser->id)}<?php endif; ?>" method="post">
+
+    {!tpl_userlinkgravatar($theuser->infos['user_id'], 100)}
+    <br/>
+    <input type='file' name='profilePic'/> <br/>
+    <input type='hidden' name='uploadProfile'/>
+    <input type="hidden" name="action" value="{Req::val('action', $do . '.uploadUserProfile')}" />
+    <?php if (Req::val('area') || $do == 'admin'): ?><input type="hidden" name="area" value="users" /><?php endif; ?>
+    <input type="hidden" name="user_id" value="{$theuser->id}" />
+    <input type='submit' value='upload'></input>
+    </form>
+</div>
+<?php } ?>
+    <form enctype="multipart/form-data" action="<?php if ($do == 'myprofile'): ?>{CreateUrl('myprofile')}<?php else: ?>{CreateUrl('edituser', $theuser->id)}<?php endif; ?>" method="post">
     <ul class="form_elements">
       <li>
         <label for="realname">{L('realname')}</label>

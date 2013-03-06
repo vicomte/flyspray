@@ -411,6 +411,56 @@ abstract class Backend
     }
 
     /**
+     * Upload picture for user profile pic
+     * @params user_id
+     * @access public
+     * @return bool
+     * @version 1.0
+     */
+    public static function upload_profile_pic($user_id, $source = 'userfile')
+    {
+
+        $res = false;
+
+        if (!isset($_FILES[$source]['error'])) {
+            return false;
+        }
+
+        foreach ($_FILES[$source]['error'] as $key => $error) {
+            if ($error != UPLOAD_ERR_OK) {
+                continue;
+            }
+
+
+            $fname = "userid.jpg";
+            $path = BASEDIR .'/profilepics/'. $fname ;
+
+            $tmp_name = $_FILES[$source]['tmp_name'][$key];
+
+            // Then move the uploaded file and remove exe permissions
+            if(!@move_uploaded_file($tmp_name, $path)) {
+                //upload failed. continue
+                continue;
+            }
+
+            @chmod($path, 0644);
+            $res = true;
+
+            // Use a different MIME type
+            $fileparts = explode( '.', $_FILES[$source]['name'][$key]);
+            $extension = end($fileparts);
+            if (isset($conf['attachments'][$extension])) {
+                $_FILES[$source]['type'][$key] = $conf['attachments'][$extension];
+                //actually, try really hard to get the real filetype, not what the browser reports.
+            } elseif($type = Flyspray::check_mime_type($path)) {
+                $_FILES[$source]['type'][$key] = $type;
+            }// we can try even more, however, far too much code is needed.
+        }
+
+        return $res;
+    }
+
+    /**
      * Delete one or more attachments of a task or comment
      * @param array $attachments
      * @access public
